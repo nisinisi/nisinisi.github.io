@@ -1,0 +1,72 @@
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<title>Sample of Yahoo!Japan NLU</title>
+</head>
+<body>
+
+<h1>Yahoo!Japan 自然言語理解Web API</h1>
+
+<p>
+<textarea style="width: 80%;height: 100px;line-height: 1.5em;" id="textForm">
+あなたは誰ですか
+</textarea>
+</p>
+
+<p>
+<button id="queryButton">実行</button>
+</p>
+
+<p>
+<div id="resultOutput"></div>
+</p>
+
+
+<script>
+const textForm = document.querySelector('#textForm'); // テキスト入力欄
+const queryButton  = document.querySelector('#queryButton'); // 実行ボタン
+const resultOutput = document.querySelector('#resultOutput'); // 結果出力エリア
+
+const URL = "https://jlp.yahooapis.jp/NLUService/V1/analyze?appid="; // APIのリクエストURL
+const APPID = "dj00aiZpPTVJWVN1UHo5MjRmNiZzPWNvbnN1bWVyc2VjcmV0Jng9MTU-"; // あなたのアプリケーションID
+
+let output = "";
+
+queryButton.addEventListener('click', function(){
+	let queryText = textForm.value; // フォームからのテキストの取得
+    let newText = queryText.replace(/\r?\n/g,'').replace(/\0/g,''); // 余計な文字の削除
+    
+	let queryURL = URL + APPID + "&intext=" + newText;
+	console.log(queryURL);
+
+	// HTTPリクエストの準備
+	const request = new XMLHttpRequest();
+	request.open('GET', queryURL, true);
+	
+	// HTTPの状態が変化したときのイベントハンドラ
+	request.onreadystatechange = function() {
+    	if (this.readyState == 4 && this.status == 200) {
+    	// readyState == 4 操作完了
+    	// status == 200 リクエスト成功（HTTPレスポンス）
+    	
+			let res = this.response;
+			console.log(res);
+			
+			let obj = JSON.parse(res);
+			Object.keys(obj.result).forEach(function (key) {
+				output = output + "<br>" + key + ": " + obj.result[key];
+			});
+			output = output + "<br>-------<br>";
+			resultOutput.innerHTML = output;
+		}
+	};
+	
+	// HTTPリクエストの実行
+	request.send();
+});
+</script>
+</body>
+</html>

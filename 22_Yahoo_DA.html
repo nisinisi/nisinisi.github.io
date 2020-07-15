@@ -1,0 +1,80 @@
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<title>Sample of Yahoo!Japan DA</title>
+</head>
+<body>
+
+<h1>Yahoo!Japan 日本語係り受け解析 API</h1>
+
+<p>
+<textarea style="width: 80%;height: 100px;line-height: 1.5em;" id="textForm">
+あなたは誰ですか
+</textarea>
+</p>
+
+<p>
+<button id="queryButton">実行</button>
+</p>
+
+<p>
+<div id="resultOutput"></div>
+</p>
+
+
+<script>
+const textForm = document.querySelector('#textForm'); // テキスト入力欄
+const queryButton  = document.querySelector('#queryButton'); // 実行ボタン
+const resultOutput = document.querySelector('#resultOutput'); // 結果出力エリア
+
+const URL = "https://jlp.yahooapis.jp/DAService/V2/parse?appid="; // APIのリクエストURL
+const APPID = "dj00aiZpPTVJWVN1UHo5MjRmNiZzPWNvbnN1bWVyc2VjcmV0Jng9MTU-"; // あなたのアプリケーションID
+const queryURL = URL + APPID;
+
+let output = "";
+
+queryButton.addEventListener('click', function(){
+	let queryText = textForm.value; // フォームからのテキストの取得
+    let newText = queryText.replace(/\r?\n/g,'').replace(/\0/g,''); // 余計な文字の削除
+    
+	// HTTPリクエストの準備
+	var postdata = {
+		"id": "1234-1", // JSON-RPC2.0 id、値は任意で、指定した値がレスポンスのidになる。
+		"jsonrpc" : "2.0", // APIで固定
+		"method" : "jlp.daservice.parse", // APIで固定
+		"params" : { "q" : newText }, // 解析対象のテキスト 
+	};
+	var jsondata = JSON.stringify(postdata);
+			
+	const request = new XMLHttpRequest();
+	request.open('POST', queryURL, true);
+	request.setRequestHeader('Content-Type', 'application/json');
+	
+	// HTTPの状態が変化したときのイベントハンドラ
+	request.onreadystatechange = function() {
+    	if (this.readyState == 4 && this.status == 200) {
+    	// readyState == 4 操作完了
+    	// status == 200 リクエスト成功（HTTPレスポンス）
+    	
+			let res = this.response;
+			console.log(res);
+			
+			//let obj = JSON.parse(res);
+			//Object.keys(obj.result.chunks).forEach(function (key) {
+			//	output = key + ": " + obj.result.chunks[key] + "<br>";
+			//});
+			resultOutput.innerHTML = res;
+		}
+	};
+	
+	// HTTPリクエストの実行
+	request.send(jsondata);
+});
+</script>
+
+
+</body>
+</html>

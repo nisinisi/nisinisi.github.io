@@ -1,0 +1,52 @@
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<script type="text/javascript" src="tiny_segmenter-0.2.js" charset="UTF-8"></script>
+<title>Sample of TinySegmenter</title>
+</head>
+<body>
+
+<h1>TinySegmenterのサンプル</h1>
+
+<p>
+TinySegmenterはJavascriptだけ書かれた極めてコンパクトな日本語分かち書きソフトウェアです。 わずか25kバイトのソースコードで、日本語の新聞記事であれば文字単位で95%程度の精度で分かち書きが行えます。<br>
+<a href="http://chasen.org/~taku/software/TinySegmenter/">http://chasen.org/~taku/software/TinySegmenter/</a>
+</p>
+
+<p>
+<textarea style="width: 80%;height: 100px;line-height: 1.5em;" id="textForm">
+あなたは誰ですか
+</textarea>
+</p>
+
+<p>
+<button id="queryButton">実行</button>
+</p>
+
+<p>
+<div id="resultOutput"></div>
+</p>
+
+
+<script>
+const textForm = document.querySelector('#textForm'); // テキスト入力欄
+const queryButton  = document.querySelector('#queryButton'); // 質問ボタン
+const resultOutput = document.querySelector('#resultOutput'); // 結果出力エリア
+
+const segmenter = new TinySegmenter(); // インスタンス生成
+
+queryButton.addEventListener('click', function(){
+	let queryText = textForm.value; // フォームからのテキストの取得
+    let newText = queryText.replace(/\r?\n/g,'').replace(/\0/g,''); // 余計な文字の削除
+    
+	let segs = segmenter.segment(newText); // 単語の配列が返る
+
+	resultOutput.innerHTML = segs.join(" | ");  // 表示
+});
+
+</script>
+</body>
+</html>
